@@ -1,7 +1,135 @@
 <!DOCTYPE html>
 <html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style type="text/css">
+	canvas {
+		background-color: #8cf1ff;
+	}
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+      	overflow-x:hidden;
+		overflow-y:hidden;
+	}
+</style>
+</head>
+<body onload="startGame()">
+	<script type="text/javascript">
+		var smile;
+		var mousePos = { x:0, y:0 };
+		var mouseFlag = 0;
+		var mouseCount = 0;
+		function startGame() {
+			dimSmile = 300
+			dimWindow = window.innerWidth
+			if (dimWindow < 600) {
+				dimSmile = dimWindow/2
+			}
+			smile = new component(dimSmile,dimSmile,"smile.png", dimWindow/2-dimSmile/2, dimSmile/2,"image")
+			myGameArea.start();
+		}
+
+		var myGameArea = {
+    		canvas : document.createElement("canvas"),
+		    start : function() {
+		        this.canvas.width = window.innerWidth;
+		        this.canvas.height = window.innerHeight;
+		        this.context = this.canvas.getContext("2d");
+		        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+
+		        this.interval = setInterval(updateGameArea, 5);        
+		    },
+		    stop : function() {
+		        clearInterval(this.interval);
+		    },    
+		    clear : function() {
+		        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		    }
+		}
+		
+		// function getMousePos(e) {
+		// 	return {
+	 //   			x: e.clientX,
+	 //   			y: e.clientY
+	 //   		}
+		// }
+		function component(width, height, color, x, y, type) {
+		    this.type = type;
+		    this.width = width;
+		    this.height = height;
+		    this.x = x;
+		    this.y = y;    
+		    this.speedX = 0;
+		    this.speedY = 0;    
+		    this.gravity = 0.01;
+		    this.gravitySpeed = 0;
+		    this.bounce = 0.6;
+		    this.boop = -1.2;
+		    this.boopSpeed = 0;
+		    if (type == "image") {
+		    	this.image = new Image();
+	        	this.image.src = color;	    
+    		}
+		    this.update = function() {
+		        ctx = myGameArea.context;
+		        if (type == "image") {
+	            ctx.drawImage(this.image, 
+	                this.x, 
+	                this.y,
+	                this.width, this.height);
+		        } else {
+		            ctx.fillStyle = color;
+		            ctx.fillRect(this.x, this.y, this.width, this.height);
+		        }
+		    }
+		    
+		    this.newPos = function() {
+		    	document.addEventListener("mousedown", function(e) {
+				    mouseFlag = 1;
+				}, false);
+		        this.x += this.speedX;
+		        if (mouseFlag) {
+		        	this.boopSpeed = this.boop;
+		        	this.y += this.speedY + this.boopSpeed;
+		        	mouseFlag = 0;
+		        	mouseCount = 1;
+		        }
+		        else if (mouseCount > 0) {
+		        	this.boopSpeed += 0.01;
+		        	this.y += this.speedY + this.boopSpeed;
+		        	if (this.boopSpeed > 0) {
+		        		mouseCount = 0;
+		        		this.gravitySpeed = this.gravity;
+		        	}
+		        }
+		        else {
+		        	this.gravitySpeed += this.gravity;
+		        	this.y += this.speedY + this.gravitySpeed;
+		        }
+		        this.hitBottom();
+		    }
+		    this.hitBottom = function() {
+		        var rockbottom = myGameArea.canvas.height - this.height;
+		        if (this.y > rockbottom) {
+		            this.y = rockbottom;
+		            this.gravitySpeed = -(this.gravitySpeed * this.bounce);
+   		        }
+		    }
+		    
+		    
+		}
+
+		function updateGameArea() {
+		    myGameArea.clear();
+		    smile.newPos();
+		    smile.update();
+
+		}
+	
+
+
+	</script>
 </body>
 </html>
