@@ -1,6 +1,7 @@
 var snek;
 var key = 39;
 var xTouchStart, xTouchEnd, yTouchStart, yTouchEnd;
+var snekSize, xx, yy;
 
 var gameArea = {
 	canvas : document.createElement("canvas"),
@@ -65,24 +66,29 @@ function handleEnd(e) {
 
 function startSnek() {
 	var areaSize = gameArea.start();
-	var snekSize = areaSize/25;
-	snek = new component(snekSize, snekSize*12);
+	snekSize = areaSize/25;
+	snek = new component(snekSize, snekSize*12, snekSize*12);
 }
 
 document.getElementsByTagName("BODY")[0].onresize = function() {
 	var areaSize = gameArea.resize();
-	var snekSize = areaSize/25;
-	snek = new component(snekSize, snekSize*12);
+	var xReal = xx/snekSize;
+	var yReal = yy/snekSize;
+	snekSize = areaSize/25;
+	xx = xReal*snekSize;
+	yy = yReal*snekSize;	
+
+	snek = new component(snekSize, xx, yy);
 	updateGameArea()
 }
 
-function component(size, pos) {
+function component(size, xPos, yPos) {
 	this.width = size;
     this.height = size;
     this.xSpeed = size;
     this.ySpeed = 0;
-    this.x = pos;
-    this.y = pos;
+    this.x = xPos;
+    this.y = yPos;
     this.key = 39;
     this.lastKey = key;
     this.update = function() {
@@ -164,8 +170,8 @@ function component(size, pos) {
 	    		this.ySpeed = 0;
 	    	}
 	    }
-		this.x += this.xSpeed;
-		this.y += this.ySpeed;
+		xx = this.x += this.xSpeed;
+		yy = this.y += this.ySpeed;
     }
 
 }
