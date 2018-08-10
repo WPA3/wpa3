@@ -98,11 +98,21 @@ function component(size, pos) {
 		this.xTouch = parseInt(xTouchEnd - xTouchStart);
 		this.yTouch = parseInt(yTouchEnd - yTouchStart);
 		// right
-		if (this.xTouch > this.yTouch && this.yTouch > 0) {
+		if (this.xTouch > Math.abs(this.yTouch)) {
 			key = 39;
+			this.xTouch = this.yTouch = 0;
 		} // left
-		else if (this.xTouch < abs(this.yTouch) && this.xTouch < 0) {
+		else if (this.xTouch < Math.abs(this.yTouch) && this.xTouch < 0) {
 			key = 37;
+			this.xTouch = this.yTouch = 0;
+		} // up
+		else if (Math.abs(this.xTouch) < this.yTouch) {
+			key = 40;
+			this.xTouch = this.yTouch = 0;
+		} // down
+		else if (Math.abs(this.xTouch) < Math.abs(this.yTouch) && this.yTouch < 0) {
+			key = 38;
+			this.xTouch = this.yTouch = 0;
 		}
 		switch (key) {
 			case 37: //left
