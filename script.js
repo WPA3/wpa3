@@ -1,6 +1,6 @@
 var snek;
 var key = 39;
-var xTouchStart, xTouchEnd, yTouchStart, yTouchEnd;
+var xTouchStart, yTouchStart;
 var snekSize, xx, yy;
 
 var gameArea = {
@@ -24,7 +24,6 @@ var gameArea = {
 		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 		this.interval = setInterval(updateGameArea, 500);
 		document.addEventListener("touchstart", handleStart, false);
-		document.addEventListener("touchend", handleEnd, false);
 		return size;
 	},
 	resize : function() {
@@ -54,14 +53,9 @@ var gameArea = {
 
 function handleStart(e) {
 	var touch = e.changedTouches[0];
-	xTouchStart = touch.pageX;
-	yTouchStart = touch.pageY;
-}
-
-function handleEnd(e) {
-	var touch = e.changedTouches[0];
-	xTouchEnd = touch.pageX;
-	yTouchEnd = touch.pageY;
+	var box = document.getElementsByTagName("canvas")[0].getBoundingClientRect();
+	xTouchStart = parseInt(touch.pageX - box.left);
+	yTouchStart = parseInt(touch.pageY - box.top);
 }
 
 function startSnek() {
@@ -82,6 +76,13 @@ document.getElementsByTagName("BODY")[0].onresize = function() {
 	updateGameArea()
 }
 
+function getDiagonals (x,y) {
+	var box = document.getElementsByTagName("canvas")[0].getBoundingClientRect();
+	var canvasSize = box.width;
+	var mainDiag = [x, x];
+	var offDiag = [x, canvasSize-x-1];
+	return {mainDiag:mainDiag, offDiag:offDiag};
+}
 function component(size, xPos, yPos) {
 	this.width = size;
     this.height = size;
@@ -101,24 +102,25 @@ function component(size, xPos, yPos) {
     	document.onkeydown = function(e) {
 	    	return key = e.which || e.keyCode;
 		}
-		this.xTouch = parseInt(xTouchEnd - xTouchStart);
-		this.yTouch = parseInt(yTouchEnd - yTouchStart);
-		// right
-		if (this.xTouch > Math.abs(this.yTouch)) {
-			key = 39;
-			this.xTouch = this.yTouch = 0;
-		} // left
-		else if (this.xTouch < Math.abs(this.yTouch) && this.xTouch < 0) {
+		this.xTouch = xTouchStart;
+		this.yTouch = yTouchStart;
+		var diag = getDiagonals(this.xTouch,this.yTouch);
+		// left, 37
+		if (this.yTouch > diag.mainDiag[1] && this.yTouch < diag.offDiag[1]) {
 			key = 37;
-			this.xTouch = this.yTouch = 0;
-		} // up
-		else if (Math.abs(this.xTouch) < this.yTouch) {
-			key = 40;
-			this.xTouch = this.yTouch = 0;
-		} // down
-		else if (Math.abs(this.xTouch) < Math.abs(this.yTouch) && this.yTouch < 0) {
+			this.xTouch = this.yTouch = null;
+		} // right, 39
+		else if (this.yTouch < diag.mainDiag[1] && this.xTouch > diag.offDiag[1]) {
+			key = 39;
+			this.xTouch = this.yTouch = null;
+		} // up, 38
+		else if (this.yTouch < diag.mainDiag[1] && this.yTouch < diag.offDiag[1]) {
 			key = 38;
-			this.xTouch = this.yTouch = 0;
+			this.xTouch = this.yTouch = null;
+		} // down, 40
+		else if (this.yTouch > diag.mainDiag[1] && this.yTouch > diag.offDiag[1]) {
+			key = 40;
+			this.xTouch = this.yTouch = null;
 		}
 		switch (key) {
 			case 37: //left
