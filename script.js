@@ -110,11 +110,12 @@ function component(size, xPos, yPos) {
 			key = 37;
 			this.xTouch = this.yTouch = null;
 		} // right, 39
-		else if (this.yTouch < diag.mainDiag[1] && this.xTouch > diag.offDiag[1]) {
+		else if (this.yTouch < diag.mainDiag[1] && this.yTouch > diag.offDiag[1]) {
 			key = 39;
 			this.xTouch = this.yTouch = null;
 		} // up, 38
 		else if (this.yTouch < diag.mainDiag[1] && this.yTouch < diag.offDiag[1]) {
+			console.log(this.yTouch, diag.mainDiag[1], diag.offDiag[1]);
 			key = 38;
 			this.xTouch = this.yTouch = null;
 		} // down, 40
